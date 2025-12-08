@@ -5,14 +5,16 @@ import com.roshan.dto.UserDTO;
 import com.roshan.entity.FitnessTrackingEntity;
 import com.roshan.entity.UsersEntity;
 import com.roshan.repository.TrackingSystemRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
 
+@AllArgsConstructor
 @Service
 public class TrackingService {
 
-    private TrackingSystemRepository trackingSystemRepository;
+    private final TrackingSystemRepository trackingSystemRepository;
 
     public void startTracking(String userId, String trackingType) {
         // Logic to start tracking

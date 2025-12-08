@@ -2518,3 +2518,9 @@ org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-22
 2025-12-02 16:00:01.100055-06:00 jdbc[13]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "SELECT * FROM USERS FITNESS_TRACKING [*]USERS"; SQL statement:
 SELECT * FROM USERS FITNESS_TRACKING USERS [42000-224]
+2025-12-08 08:39:54.902248-06:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "USERSFITNESS_TRACKING" not found; SQL statement:
+SELECT * FROM USERSFITNESS_TRACKING [42102-224]
+2025-12-08 08:40:00.073024-06:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "USERSFITNESS_TRACKING" not found; SQL statement:
+SELECT * FROM USERSFITNESS_TRACKING [42102-224]
