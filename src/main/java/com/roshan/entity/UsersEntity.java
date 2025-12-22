@@ -35,9 +35,9 @@ public class UsersEntity implements Serializable {
     @Column(name = "PhoneNumber", nullable = false, unique = true)
     private String phoneNumber;
 
-    @Column(name = "create_timestamp", nullable = false)
+    @Column(name = "CreateTimestamp", nullable = false)
     private OffsetDateTime createTimestamp;
 
-    @Column(name = "update_timestamp", nullable = false)
+    @Column(name = "UpdateTimestamp", nullable = false)
     private OffsetDateTime updateTimestamp;
 }

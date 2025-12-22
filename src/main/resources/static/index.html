@@ -1,0 +1,129 @@
+<!-- language: html -->
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Fitness API UI</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 24px; }
+        form { border: 1px solid #ddd; padding: 12px; margin-bottom: 16px; max-width: 600px; }
+        label { display:block; margin-top:8px; }
+        input, select { width: 100%; padding:6px; box-sizing: border-box; }
+        button { margin-top:12px; padding:8px 12px; }
+        pre { background:#f7f7f7; padding:12px; overflow:auto; max-width: 600px; }
+    </style>
+</head>
+<body>
+<h2>Create User</h2>
+<form id="createUserForm">
+    <label>User Name<input id="user_userName" required /></label>
+    <label>Email<input id="user_email" type="email" required /></label>
+    <label>First Name<input id="user_firstName" /></label>
+    <label>Last Name<input id="user_lastName" /></label>
+    <label>Phone Number<input id="user_phoneNumber" /></label>
+    <button type="submit">Create User</button>
+</form>
+
+<h2>Search User</h2>
+<form id="searchUserForm">
+    <label>User Name<input id="search_userName" /></label>
+    <label>Email<input id="search_email" type="email" /></label>
+    <button type="submit">Search User</button>
+</form>
+
+<h2>Create Tracking</h2>
+<form id="createTrackingForm">
+    <label>Tracking Name<input id="t_trackingName" required /></label>
+    <label>Tracking Type<input id="t_trackingType" /></label>
+    <label>Status<select id="t_status">
+        <option>COMPLETED</option><option>IN_PROGRESS</option><option>PLANNED</option>
+    </select></label>
+    <label>Total Distance<input id="t_totalDistance" placeholder="e.g. 5 km" /></label>
+    <label>Average Pace<input id="t_averagePace" placeholder="e.g. 4 km/h" /></label>
+    <label>Start Time<input id="t_startTime" type="datetime-local" /></label>
+    <label>End Time<input id="t_endTime" type="datetime-local" /></label>
+    <label>User ID<input id="t_userId" type="number" required /></label>
+    <button type="submit">Save Tracking</button>
+</form>
+
+<h3>Response</h3>
+<pre id="responseOutput">No requests yet.</pre>
+
+<script>
+    const out = id => document.getElementById(id);
+    function showResponse(obj) {
+      out('responseOutput').textContent = JSON.stringify(obj, null, 2);
+    }
+
+    document.getElementById('createUserForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const payload = {
+        userName: out('user_userName').value,
+        email: out('user_email').value,
+        firstName: out('user_firstName').value,
+        lastName: out('user_lastName').value,
+        phoneNumber: out('user_phoneNumber').value
+      };
+      try {
+        const res = await fetch('/fitness/createuser', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json().catch(() => ({ status: res.status, text: 'No JSON' }));
+        showResponse({ httpStatus: res.status, body: data });
+      } catch (err) {
+        showResponse({ error: String(err) });
+      }
+    });
+
+    document.getElementById('searchUserForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const params = new URLSearchParams();
+      const userName = out('search_userName').value;
+      const email = out('search_email').value;
+      if (userName) params.append('userName', userName);
+      if (email) params.append('email', email);
+      try {
+        const res = await fetch('/fitness/searchuser?' + params.toString(), {
+          method: 'GET',
+          headers: { 'Accept': 'application/json' }
+        });
+        const data = await res.json().catch(() => ({ status: res.status, text: 'No JSON' }));
+        showResponse({ httpStatus: res.status, body: data });
+      } catch (err) {
+        showResponse({ error: String(err) });
+      }
+    });
+
+    document.getElementById('createTrackingForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      function toIso(id) {
+        const v = out(id).value;
+        return v ? new Date(v).toISOString() : null;
+      }
+      const payload = {
+        trackingName: out('t_trackingName').value,
+        trackingType: out('t_trackingType').value,
+        status: out('t_status').value,
+        totalDistance: out('t_totalDistance').value,
+        averagePace: out('t_averagePace').value,
+        startTime: toIso('t_startTime'),
+        endTime: toIso('t_endTime'),
+        user: { userId: Number(out('t_userId').value) }
+      };
+      try {
+        const res = await fetch('/fitness/savetrackingdata', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json().catch(() => ({ status: res.status, text: 'No JSON' }));
+        showResponse({ httpStatus: res.status, body: data });
+      } catch (err) {
+        showResponse({ error: String(err) });
+      }
+    });
+</script>
+</body>
+</html>

@@ -14,10 +14,11 @@ public class UserService {
 
     private final UsersRepository usersRepository;
 
+
     public UsersEntity createUser(UserDTO userDTO) {
         // Business logic to create a user
         UsersEntity usersEntity = new UsersEntity();
-        usersEntity.setUserId(userDTO.getUserId());
+        //usersEntity.setUserId(userDTO.getUserId());
         usersEntity.setUserName(userDTO.getUserName());
         usersEntity.setFirstName(userDTO.getFirstName());
         usersEntity.setLastName(userDTO.getLastName());

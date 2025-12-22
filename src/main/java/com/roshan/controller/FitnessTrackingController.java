@@ -14,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.OffsetDateTime;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -30,67 +29,40 @@ public class FitnessTrackingController {
     @GetMapping("/getTrackingDataByUserNameAndTrackingType/{userName}/{TrackingType}")
     public ResponseEntity<TrackingSystemDTO> getTrackingDataByUserAndTrackingType(@PathVariable String userName, @PathVariable String TrackingType) {
         log.info("Fetching tracking data for userName: {} and trackingType: {}", userName, TrackingType);
-         //step 1: Fetch UsersEntity by userName to grab the userId
-        // step 2: Use userId to fetch tracking data
-        UsersEntity usersEntity = usersRepository.findByUserName(userName);
-        if (usersEntity == null) {
+
+        TrackingSystemDTO trackingSystemDTO = trackingService.getTrackingDataByUserNameAndType(userName, TrackingType);
+
+        if (trackingSystemDTO == null) {
             log.warn("User not found with userName: {}", userName);
             return ResponseEntity.notFound().build();
         }
-        Integer userId = usersEntity.getUserId();
-        FitnessTrackingEntity trackingData = trackingSystemRepository.findByUserIdAndTrackingType(userId, TrackingType);
-        if (trackingData == null) {
-            log.warn("Tracking data not found for userId: {} and trackingType: {}", userId, TrackingType);
-            return ResponseEntity.notFound().build();
-        }
-        // Map entity to DTO
-        TrackingSystemDTO trackingSystemDTO = new TrackingSystemDTO();
-        UserDTO userDTO = new UserDTO();
-        userDTO.setUserId(usersEntity.getUserId());
-        userDTO.setUserName(usersEntity.getUserName());
-        userDTO.setFirstName(usersEntity.getFirstName());
-        userDTO.setLastName(usersEntity.getLastName());
-        userDTO.setEmail(usersEntity.getEmail());
-        trackingSystemDTO.setUser(userDTO);
-        trackingSystemDTO.setTrackingId(trackingData.getTrackingId());
-        trackingSystemDTO.setTrackingName(trackingData.getTrackingName());
-        trackingSystemDTO.setTrackingType(trackingData.getTrackingType());
-        trackingSystemDTO.setStatus(trackingData.getStatus());
-        trackingSystemDTO.setTotalDistance(trackingData.getTotalDistance());
-        trackingSystemDTO.setStartTime(String.valueOf(trackingData.getStartTime()));
-        trackingSystemDTO.setEndTime(String.valueOf(trackingData.getEndTime()));
-        trackingSystemDTO.setAveragePace(trackingData.getAveragePace());
+
         return ResponseEntity.ok(trackingSystemDTO);
+    }
+
+    @PostMapping(path = "/start-tracking", consumes = "application/json")
+    public ResponseEntity<FitnessTrackingEntity> startTracking(@RequestBody TrackingSystemDTO trackingSystemDTO) {
+        log.info("Saving tracking data for userId: {}", trackingSystemDTO.getUser().getUserId());
+
+        FitnessTrackingEntity savedEntity = trackingService.startTrackingData(trackingSystemDTO);
+        if (savedEntity == null) {
+            log.warn("Failed to save tracking data for userId: {}", trackingSystemDTO.getUser().getUserId());
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(savedEntity);
 
     }
 
-    @PostMapping(path = "/savetrackingdata", consumes = "application/json")
-    public ResponseEntity<FitnessTrackingEntity> saveTrackingData(@RequestBody TrackingSystemDTO trackingSystemDTO) {
-        log.info("Saving tracking data for userId: {}", trackingSystemDTO.getUser().getUserId());
-        // Placeholder implementation
-        FitnessTrackingEntity entity = new FitnessTrackingEntity();
-        // Map DTO to entity
+    @PutMapping(path = "/{id}/complete-tracking", consumes = "application/json")
+    public ResponseEntity<FitnessTrackingEntity> completeTracking(@PathVariable Integer id, @RequestBody TrackingSystemDTO trackingSystemDTO) {
+        log.info("Completing tracking with id: {}", id);
 
-        // Get UsersEntity by userId
-        UsersEntity usersEntity = usersRepository.findById(trackingSystemDTO.getUser().getUserId()).orElse(new UsersEntity());
-
-        if (usersEntity == null) {
-            log.warn("User not found with userId: {}", trackingSystemDTO.getUser().getUserId());
-            return ResponseEntity.badRequest().build();
+        FitnessTrackingEntity updatedEntity = trackingService.completeTracking(id, trackingSystemDTO);
+        if (updatedEntity == null) {
+            log.warn("Tracking entity not found with id: {}", id);
+            return ResponseEntity.notFound().build();
         }
-        entity.setUsersEntity(usersEntity);
-
-        entity.setTrackingName(trackingSystemDTO.getTrackingName());
-        entity.setTrackingType(trackingSystemDTO.getTrackingType());
-        entity.setStatus(trackingSystemDTO.getStatus());
-        entity.setTotalDistance(trackingSystemDTO.getTotalDistance());
-        entity.setStartTime(OffsetDateTime.parse(trackingSystemDTO.getStartTime()));
-        entity.setEndTime(OffsetDateTime.parse(trackingSystemDTO.getEndTime()));
-        entity.setAveragePace(trackingSystemDTO.getAveragePace());
-        // Simulate saving entity
-        FitnessTrackingEntity savedEntity = trackingSystemRepository.save(entity);
-        return ResponseEntity.ok(savedEntity);
-
+        return ResponseEntity.ok(updatedEntity);
     }
 
     @PostMapping(path = "/createuser", consumes = "application/json")

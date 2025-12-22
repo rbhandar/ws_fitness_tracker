@@ -5,6 +5,7 @@ import com.roshan.dto.UserDTO;
 import com.roshan.entity.FitnessTrackingEntity;
 import com.roshan.entity.UsersEntity;
 import com.roshan.repository.TrackingSystemRepository;
+import com.roshan.repository.UsersRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -25,13 +26,18 @@ class TrackingServiceTest {
     @Mock
     private TrackingSystemRepository trackingSystemRepository;
 
+    @Mock
+    private UsersRepository usersRepository;
+
     @Test
     public void testGetTrackingDataByUserIdAndType() {
         // Arrange
         Integer userId = 123;
+        String userName = "testuser";
         String trackingType = "steps";
 
         UserDTO userDTO = new UserDTO();
+        userDTO.setUserName(userName);
         userDTO.setUserId(userId);
 
         TrackingSystemDTO trackingSystemDTO = new TrackingSystemDTO();
@@ -46,6 +52,10 @@ class TrackingServiceTest {
 
         UsersEntity usersEntity = new UsersEntity();
         usersEntity.setUserId(userId);
+        usersEntity.setUserName(userName);
+
+        when(usersRepository.findByUserName(userName)).thenReturn(usersEntity);
+        
         FitnessTrackingEntity fitnessTrackingEntity = new FitnessTrackingEntity();
         fitnessTrackingEntity.setUsersEntity(usersEntity);
         fitnessTrackingEntity.setTrackingType(trackingType);
@@ -60,7 +70,7 @@ class TrackingServiceTest {
                 .thenReturn(fitnessTrackingEntity);
 
         // Act
-        TrackingSystemDTO result = trackingService.getTrackingDataByUserIdAndType(userId, trackingType);
+        TrackingSystemDTO result = trackingService.getTrackingDataByUserNameAndType(userName, trackingType);
         // Assert
         assertNotNull(result);
         assertEquals(trackingSystemDTO.getUser().getUserId(), result.getUser().getUserId());
