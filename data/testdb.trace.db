@@ -4144,3 +4144,24 @@ org.h2.jdbc.JdbcSQLNonTransientConnectionException: Database is already closed (
 	at java.base/java.lang.Iterable.forEach(Iterable.java:75)
 	at org.springframework.boot.SpringApplicationShutdownHook.run(SpringApplicationShutdownHook.java:116)
 	at java.base/java.lang.Thread.run(Thread.java:833)
+2026-02-21 23:24:33.593800-06:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "[*]USERID"; expected "UPDATE"; SQL statement:
+USERID [42001-224]
+2026-02-21 23:24:47.181659-06:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "[*]USERID"; expected "UPDATE"; SQL statement:
+USERID [42001-224]
+2026-02-21 23:25:03.976886-06:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "[*]USERID TRACKINGID"; expected "UPDATE"; SQL statement:
+USERID TRACKINGID [42001-224]
+2026-02-21 23:25:41.574393-06:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "[*]USERID"; expected "UPDATE"; SQL statement:
+USERID [42001-224]
+2026-02-21 23:25:58.986635-06:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "USERID" not found; SQL statement:
+select * FROM USERID [42102-224]
+2026-02-21 23:26:18.780926-06:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "[*]USERID"; expected "UPDATE"; SQL statement:
+USERID [42001-224]
+2026-02-21 23:27:23.753192-06:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "[*]USERID"; expected "UPDATE"; SQL statement:
+USERID [42001-224]

@@ -18,6 +18,4 @@ public class TrackingSystemDTO {
     private OffsetDateTime createTimestamp;
     private OffsetDateTime updateTimestamp;
     private UserDTO user;
-
-
 }

@@ -1,4 +1,3 @@
-<!-- language: html -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -6,11 +5,11 @@
     <title>Fitness API UI</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 24px; }
-        form { border: 1px solid #ddd; padding: 12px; margin-bottom: 16px; max-width: 600px; }
+        form { border: 1px solid #ddd; padding: 12px; margin-bottom: 16px; max-width: 700px; }
         label { display:block; margin-top:8px; }
-        input, select { width: 100%; padding:6px; box-sizing: border-box; }
+        input, select, textarea { width: 100%; padding:6px; box-sizing: border-box; }
         button { margin-top:12px; padding:8px 12px; }
-        pre { background:#f7f7f7; padding:12px; overflow:auto; max-width: 600px; }
+        pre { background:#f7f7f7; padding:12px; overflow:auto; max-width: 900px; }
     </style>
 </head>
 <body>
@@ -46,6 +45,35 @@
     <button type="submit">Save Tracking</button>
 </form>
 
+<!-- New: Create Goal -->
+<h2>Create Goal</h2>
+<form id="createGoalForm">
+    <label>Goal Type<input id="g_goalType" placeholder="e.g. weight" required /></label>
+    <label>Goal Value<input id="g_goalValue" placeholder="e.g. 70kg" required /></label>
+    <label>Start Date<input id="g_startDate" type="date" required /></label>
+    <label>End Date<input id="g_endDate" type="date" /></label>
+    <button type="submit">Create Goal</button>
+</form>
+
+<!-- New: Create Health Risk -->
+<h2>Create Health Risk</h2>
+<form id="createHealthRiskForm">
+    <label>User ID<input id="hr_userId" type="number" required /></label>
+    <label>Risk Level<input id="hr_riskLevel" placeholder="e.g. HIGH" required /></label>
+    <label>Calculated Date<input id="hr_calculatedDate" type="date" required /></label>
+    <label>Remarks<textarea id="hr_remarks" rows="2" placeholder="short notes"></textarea></label>
+    <button type="submit">Create Health Risk</button>
+</form>
+
+<!-- New: Create Food Item -->
+<h2>Create Food Item</h2>
+<form id="createFoodItemForm">
+    <label>Food Name<input id="f_foodName" required /></label>
+    <label>Food Category<input id="f_foodCategory" required /></label>
+    <label>Food Description<textarea id="f_foodDescription" rows="2"></textarea></label>
+    <button type="submit">Create Food Item</button>
+</form>
+
 <h3>Response</h3>
 <pre id="responseOutput">No requests yet.</pre>
 
@@ -55,6 +83,7 @@
       out('responseOutput').textContent = JSON.stringify(obj, null, 2);
     }
 
+    // Create User
     document.getElementById('createUserForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const payload = {
@@ -77,6 +106,7 @@
       }
     });
 
+    // Search User
     document.getElementById('searchUserForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const params = new URLSearchParams();
@@ -96,6 +126,7 @@
       }
     });
 
+    // Create Tracking (fixed to use t_userId)
     document.getElementById('createTrackingForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       function toIso(id) {
@@ -114,6 +145,74 @@
       };
       try {
         const res = await fetch('/fitness/savetrackingdata', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json().catch(() => ({ status: res.status, text: 'No JSON' }));
+        showResponse({ httpStatus: res.status, body: data });
+      } catch (err) {
+        showResponse({ error: String(err) });
+      }
+    });
+
+    // Create Goal
+    document.getElementById('createGoalForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const toIsoDate = id => {
+        const v = out(id).value; return v ? new Date(v).toISOString() : null;
+      };
+      const payload = {
+        goalType: out('g_goalType').value,
+        goalValue: out('g_goalValue').value,
+        startDate: out('g_startDate').value ? out('g_startDate').value : null,
+        endDate: out('g_endDate').value ? out('g_endDate').value : null
+      };
+      try {
+        const res = await fetch('/fitness/create-goal', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json().catch(() => ({ status: res.status, text: 'No JSON' }));
+        showResponse({ httpStatus: res.status, body: data });
+      } catch (err) {
+        showResponse({ error: String(err) });
+      }
+    });
+
+    // Create Health Risk
+    document.getElementById('createHealthRiskForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const payload = {
+        user: { userId: Number(out('hr_userId').value) },
+        riskLevel: out('hr_riskLevel').value,
+        calculatedDate: out('hr_calculatedDate').value ? out('hr_calculatedDate').value : null,
+        remarks: out('hr_remarks').value
+      };
+      try {
+        const res = await fetch('/fitness/create-health-risk', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json().catch(() => ({ status: res.status, text: 'No JSON' }));
+        showResponse({ httpStatus: res.status, body: data });
+      } catch (err) {
+        showResponse({ error: String(err) });
+      }
+    });
+
+    // Create Food Item
+    document.getElementById('createFoodItemForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const payload = {
+        foodName: out('f_foodName').value,
+        foodCategory: out('f_foodCategory').value,
+        foodDescription: out('f_foodDescription').value
+      };
+      try {
+        const res = await fetch('/fitness/create-food-item', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
